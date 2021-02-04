@@ -1,0 +1,140 @@
+package com.abhishekwagh.assignment.fragments;
+
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextClock;
+import android.widget.TextView;
+
+
+import com.abhishekwagh.assignment.R;
+import com.abhishekwagh.assignment.db.AppDatabase;
+import com.abhishekwagh.assignment.db.Entry;
+import com.github.drjacky.imagepicker.ImagePicker;
+import com.google.android.material.tabs.TabLayout;
+
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
+
+public class CreateEntryFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
+
+    ImageView imageView;
+    Bitmap bmpImage;
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+
+    EditText textName, textDOB, textMobile;
+    Button buttonSave;
+    ViewPager viewPager;
+    TabLayout tabLayout;
+    ImageButton imageButton;
+
+    public CreateEntryFragment() {
+        // Required empty public constructor
+    }
+
+    public static CreateEntryFragment newInstance(String param1, String param2) {
+        CreateEntryFragment fragment = new CreateEntryFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_create_entry, container, false);
+        init(view);
+        return view;
+
+
+    }
+
+    private void init(View view) {
+        imageView =view.findViewById(R.id.image_view);
+        bmpImage = null;
+        textName = view.findViewById(R.id.tv_name);
+        textDOB = view.findViewById(R.id.tv_dob);
+        textDOB.setFocusable(false);
+        textMobile = view.findViewById(R.id.tv_mobile);
+        buttonSave = view.findViewById(R.id.save_button);
+        AppDatabase db = AppDatabase.getDbInstance(this.getContext());
+        viewPager = getActivity().findViewById(R.id.view_pager);
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Entry entry = new Entry(textName.getText().toString(),
+                        textDOB.getText().toString(),
+                        textMobile.getText().toString());
+                db.entryDao().insertEntry(entry);
+//                getFragmentManager()
+//                        .beginTransaction()
+//                        .replace(new ViewEntryListFragment())
+//                        .commit();
+
+                viewPager.setCurrentItem(0);
+            }
+        });
+
+        textDOB.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    getContext(),
+                    this,
+                    Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH),
+                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+            );
+            datePickerDialog.show();
+        });
+
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        String month_text = new DateFormatSymbols().getMonths()[month-1];
+        String date = dayOfMonth+"/"+ month_text +"/"+year;
+        Log.d("abc","date: "+date);
+        textDOB.setText(date);
+
+
+
+
+    }
+}
