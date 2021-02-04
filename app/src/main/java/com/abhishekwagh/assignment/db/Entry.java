@@ -4,6 +4,7 @@ package com.abhishekwagh.assignment.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -19,17 +20,26 @@ public class Entry implements Serializable {
     @ColumnInfo(name = "name")
     public String name;
 
+
     @ColumnInfo(name = "dob")
     public String dob;
 
     @ColumnInfo(name = "mobile")
     public String mobile;
 
-    public Entry( String name, String dob, String mobile) {
+    public Entry(String name, String dob, String mobile) {
+        this.name = name;
+        this.dob = dob;
+        this.mobile = mobile;
+    }
+
+    @Ignore
+    public Entry( int uid, String name, String dob, String mobile) {
 
         this.name = name;
         this.dob = dob;
         this.mobile = mobile;
+        this.uid = uid;
     }
 
 

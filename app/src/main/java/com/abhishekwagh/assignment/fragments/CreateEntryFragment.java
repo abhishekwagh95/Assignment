@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +24,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextClock;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.abhishekwagh.assignment.R;
+import com.abhishekwagh.assignment.activities.MainActivity;
 import com.abhishekwagh.assignment.db.AppDatabase;
 import com.abhishekwagh.assignment.db.Entry;
 import com.github.drjacky.imagepicker.ImagePicker;
@@ -33,10 +37,11 @@ import com.google.android.material.tabs.TabLayout;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class CreateEntryFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     ImageView imageView;
-    Bitmap bmpImage;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -52,7 +57,11 @@ public class CreateEntryFragment extends Fragment implements DatePickerDialog.On
     Button buttonSave;
     ViewPager viewPager;
     TabLayout tabLayout;
-    ImageButton imageButton;
+
+    Uri fileUri;
+
+
+
 
     public CreateEntryFragment() {
         // Required empty public constructor
@@ -84,12 +93,11 @@ public class CreateEntryFragment extends Fragment implements DatePickerDialog.On
         init(view);
         return view;
 
-
     }
 
     private void init(View view) {
         imageView =view.findViewById(R.id.image_view);
-        bmpImage = null;
+
         textName = view.findViewById(R.id.tv_name);
         textDOB = view.findViewById(R.id.tv_dob);
         textDOB.setFocusable(false);
@@ -113,7 +121,24 @@ public class CreateEntryFragment extends Fragment implements DatePickerDialog.On
             }
         });
 
-        textDOB.setOnClickListener(v -> {
+        //To add images
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImagePicker.Companion.with(CreateEntryFragment.this)
+                        //.crop()                    //Crop image(Optional), Check Customization for more option
+                        //.cropOval()                //Allow dimmed layer to have a circle inside
+                        .compress(1024)            //Final image size will be less than 1 MB(Optional)
+                        .maxResultSize(1080, 1080)   //Final image resolution will be less than 1080 x 1080(Optional)
+                        .start();
+
+
+
+
+            }
+        });
+
+                textDOB.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     getContext(),
                     this,
@@ -132,8 +157,46 @@ public class CreateEntryFragment extends Fragment implements DatePickerDialog.On
         String date = dayOfMonth+"/"+ month_text +"/"+year;
         Log.d("abc","date: "+date);
         textDOB.setText(date);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
 
+
+//        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("abc",data.toString());
+        //Toast.makeText(getActivity(), data.toString(), Toast.LENGTH_SHORT).show();
+        if (resultCode == Activity.RESULT_OK) {
+            //Image Uri will not be null for RESULT_OK
+            fileUri = data.getData();
+            imageView.setImageURI(fileUri);
+
+
+
+
+
+
+
+
+
+
+
+          // Toast.makeText(getActivity(), fileUri.toString(), Toast.LENGTH_SHORT).show();
+
+
+           // Log.d("abc",fileUri.toString());
+
+            //You can get File object from intent
+//            File file = ImagePicker.getFile(data);
+
+            //You can also get File Path from intent
+//                    val filePath:String = ImagePicker.getFilePath(data)!!
+        } else if (resultCode == ImagePicker.RESULT_ERROR) {
+            Toast.makeText(getActivity(), "Error_here", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), "Task Cancelled", Toast.LENGTH_SHORT).show();
+        }
 
 
     }

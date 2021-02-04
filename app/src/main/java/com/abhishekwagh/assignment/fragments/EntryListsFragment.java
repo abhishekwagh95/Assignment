@@ -3,6 +3,7 @@ package com.abhishekwagh.assignment.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 
+import com.abhishekwagh.assignment.EntryViewModel;
 import com.abhishekwagh.assignment.R;
 import com.abhishekwagh.assignment.adapters.EntryListsAdapter;
 import com.abhishekwagh.assignment.db.AppDatabase;
@@ -23,12 +25,15 @@ import com.abhishekwagh.assignment.db.Entry;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.schedulers.Schedulers;
+
 public class EntryListsFragment extends Fragment {
 
     RecyclerView recyclerView;
     EntryListsAdapter entryListAdapter;
     EditText search;
     List<Entry> entryList;
+    ArrayList<Entry> alContactModels;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +53,20 @@ public class EntryListsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getContext()));
+    //    EntryViewModel entryViewModel = ViewModelProviders.of(this).get(EntryViewModel.class);
+      //  alContactModels = new ArrayList<>();
+
+//        EntryViewModel.getList().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(ContactsModel ->
+//        {
+////            System.out.println("Size: " + Entry.size());
+////            Entry contactsModelObj;
+//            for (int i = 0; i < ContactsModel.size(); i++) {
+//                contactsModelObj = ContactsModel.get(i);
+//                contactsModelObj.getName();
+//                alContactModels.add(contactsModelObj);
+//            }
+
+
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this.getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
